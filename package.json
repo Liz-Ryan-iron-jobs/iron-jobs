@@ -1,5 +1,5 @@
 {
-  "name": "iron-jobs",
+  "name": "ryan-liz",
   "version": "1.0.0",
   "description": "An application for sharing job postings with other Iron Yard students and graduates.",
   "main": "server/app.js",
@@ -7,5 +7,18 @@
     "start": "node ."
   },
   "author": "TIY DC Cohort",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Liz-Ryan-iron-jobs/iron-jobs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Liz-Ryan-iron-jobs/iron-jobs/issues"
+  },
+  "homepage": "https://github.com/Liz-Ryan-iron-jobs/iron-jobs#readme"
 }
