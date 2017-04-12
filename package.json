@@ -1,0 +1,11 @@
+{
+  "name": "iron-jobs",
+  "version": "1.0.0",
+  "description": "An application for sharing job postings with other Iron Yard students and graduates.",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "TIY DC Cohort",
+  "license": "MIT"
+}
