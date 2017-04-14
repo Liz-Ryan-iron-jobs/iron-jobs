@@ -10,30 +10,42 @@ const Job = require('../models/Job.model.js');
 */
 
 jobRouter.get('/', function showAllJobs(req,res,next){
-  Job.find()
-  .then(function sendBackAllJobs(allJobs){
-    console.info(allJobs);
-    res.json(allJobs);
-  })
-  .catch(function handleIssues(err){
-    console.log(err);
-    let ourError = new Error('Unable to retrieve jobs');
-    ourError.status = 500;
-    return next(ourError);
-  });
+  if (Object.keys(req.query).length){
+    // Send back jobs that match a query.
+    Job.find({company: {$regex: req.query.query, $options: 'i'}})
+    .then(function sendBackMatchingJobs(allMatchingData){
+      res.json(allMatchingData.map(function(job){
+        return {id: job._id, company: job.company, link: job.link, notes: job.notes, createTime:job.createTime};
+      }));
+    })
+    .catch(function handleIssues(err){
+      let ourError = new Error('Unable to retrieve search results');
+      ourError.status = 500;
+      return next(ourError);
+    });
+  } else {
+    // Send back all jobs.
+    Job.find()
+    .then(function sendBackAllJobs(allJobs){
+      res.json(allJobs.map(function(job){
+        return {id:job._id, company:job.company, link: job.link, notes:job.notes, createTime:job.createTime};
+      }));
+    })
+    .catch(function handleIssues(err){
+      console.log(err);
+      let ourError = new Error('Unable to retrieve jobs');
+      ourError.status = 500;
+      return next(ourError);
+    });
+  }
 });
 
-jobRouter.get('/find', function findMatchingJobs(req, res, next){
-  Job.find({company: {$regex: req.query.search, $options: 'i'}})
-  .then(function sendBackMatchingJobs(allMatchingData){
-    res.json(allMatchingData);
-  })
-  .catch(function handleIssues(err){
-    let ourError = new Error('Unable to retrieve search results');
-    ourError.status = 500;
-    return next(ourError);
-  });
-});
+
+
+
+
+
+
 
 jobRouter.get('/:jobid', function retrieveSingleJob(req, res, next){
   Job.findById(req.params.jobid)
@@ -43,14 +55,33 @@ jobRouter.get('/:jobid', function retrieveSingleJob(req, res, next){
       ourError.status = 404;
       return next(ourError);
     }
-    res.json({theJobIsFound: data.job});
+    console.info(data);
+    res.json({company: data.company, link: data.link, notes: data.notes, id: data._id, createTime: data.createTime});
   })
   .catch(function handleIssues(err){
     console.log(err);
     let ourError = new Error('Unable to retrieve single job');
     ourError.status = 500;
-    return next(err);
+    return next(ourError);
   });
+});
+
+jobRouter.delete('/:id', function deleteJob(req,res,next){
+  Job.findById({_id: req.params.id})
+    .then(function removeTheJob(job){
+      if(!job){
+        let err = new Error('job to delete not found');
+        err.status=404;
+        return next(err);
+      }
+      job.remove();
+      res.json(job);
+    })
+    .catch(function handleIssues(err){
+      let ourError = new Error('There was an error finding the job');
+      ourError.status = err.status;
+      return next(ourError);
+    });
 });
 
 /**
@@ -68,17 +99,16 @@ function addAJob(req,res,next){
     return next(ourError);
   }
 
-  let theJobCreated = new Job({company: req.body.company, link: req.body.link, notes: req.body.notes});
+  let theJobCreated = new Job({company: req.body.company, link: req.body.link, notes: req.body.notes, createTime: new Date()});
 
   theJobCreated.save()
   .then(function sendBackTheResponse(data){
     res.json(data);
   })
   .catch(function handleIssues(err){
-    console.log(err);
     let ourError = new Error('Unable to save the new Job');
-    ourError.status = 500;
-    return next(ourError);
+    ourError.status = 422;
+    next(ourError);
   });
 }
 
