@@ -2,11 +2,11 @@ const jobRouter = require('express').Router();
 const Job = require('../models/Job.model.js');
 
 /**
-* Shows jobs array
-* @param {Object} req
-* @param {Object} res
-* @param {Function}
-* @type {Array}
+* Shows an array containing objects defining each job
+* @param {Object} req requests a job based on its ID
+* @param {Object} res responds with ID based job
+* @param {Function} next moves to next function
+* @return {Object} the object with the corrected property names.
 */
 
 jobRouter.get('/', function showAllJobs(req,res,next){
@@ -40,13 +40,12 @@ jobRouter.get('/', function showAllJobs(req,res,next){
   }
 });
 
-
-
-
-
-
-
-
+/**
+ * Retrieves a single job via ID
+ * @param {Object}    req requests the ID from the URL path
+ * @param {Object}    res responds with a json
+ * @param {function}  next
+ */
 jobRouter.get('/:jobid', function retrieveSingleJob(req, res, next){
   Job.findById(req.params.jobid)
   .then(function sendBackSingleJob(data){
@@ -66,29 +65,36 @@ jobRouter.get('/:jobid', function retrieveSingleJob(req, res, next){
   });
 });
 
+/**
+ * Deletes a single job
+ * @param {Object} req requests sent from front end
+ * @param {Object} res responds back to the front end
+ * @param {function} next moves to next function
+ * @return {void}
+ */
 jobRouter.delete('/:id', function deleteJob(req,res,next){
   Job.findById({_id: req.params.id})
-    .then(function removeTheJob(job){
-      if(!job){
-        let err = new Error('job to delete not found');
-        err.status=404;
-        return next(err);
-      }
-      job.remove();
-      res.json(job);
-    })
-    .catch(function handleIssues(err){
-      let ourError = new Error('There was an error finding the job');
-      ourError.status = err.status;
-      return next(ourError);
-    });
+  .then(function removeTheJob(job){
+    if(!job){
+      let err = new Error('job to delete not found');
+      err.status=404;
+      return next(err);
+    }
+    job.remove();
+    res.json(job);
+  })
+  .catch(function handleIssues(err){
+    let ourError = new Error('There was an error finding the job');
+    ourError.status = err.status;
+    return next(ourError);
+  });
 });
 
 /**
-* Adds a job to our collection
-* @param {Object}   req  Must have a body like { "company": String , "link": String}
+* Adds a job to our database
+* @param {Object}   req  Must have a body like { "company": String , "link": String, "Notes": String, "createTime": Number}
 * @param {Object}   res  The Response will contain a message if added: { message: 'I added it'}
-* @param {Function} next [description]
+* @param {Function} next moves to next function once reached
 * @return {Void}
 */
 function addAJob(req,res,next){
@@ -98,9 +104,7 @@ function addAJob(req,res,next){
     ourError.status = 400;
     return next(ourError);
   }
-
   let theJobCreated = new Job({company: req.body.company, link: req.body.link, notes: req.body.notes, createTime: new Date()});
-
   theJobCreated.save()
   .then(function sendBackTheResponse(data){
     res.json(data);
