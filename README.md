@@ -10,7 +10,7 @@ Last thing: run it on the command line with `npm start`
 ## How to develop
 Without the use of the front end, use POSTMAN via Chrome to test.
 In order to allow node to track any changes, add `nodemon` globally via terminal with
-`npm install -g nodemon` and run with `nodemon .`
+`npm install -g nodemon` and run with `nodemon .`.
 
 ### Client
 
