@@ -8,9 +8,9 @@ Easy! First, clone the repo locally. Then install the dependencies with `npm ins
 Last thing: run it on the command line with `npm start`
 
 ## How to develop
-Without the use of the front end, use POSTMAN via Chrome to test.
-In order to allow node to track any changes, add `nodemon` globally via terminal with
-`npm install -g nodemon` and run with `nodemon .`.
+Without the use of the front end, use POSTMAN via Chrome to test. With the use of the front end, use the URL
+127.0.0.1:3000. In order to allow node to track any changes, add `nodemon` globally via terminal with
+`npm install -g nodemon` and run with `nodemon .`. Ensure to stop the server before stopping mongoDB otherwise issues will occur. 
 
 ### Client
 
